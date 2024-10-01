@@ -105,29 +105,53 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center', 
     padding: 16,
-  },
-  header: {
-    fontSize: 24,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+    backgroundColor: '#f5f5f5',
   },
   image: {
-    width: 300,
-    resizeMode: 'contain',
+    width: 250,
+    height: 400,
+    resizeMode: 'contain', 
+  },
+  input: {
+    width: '100%',
+    maxWidth: 350, 
+    height: 45,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  button: {
+    width: '100%',
+    maxWidth: 350,
+    backgroundColor: '#007BFF', 
+    padding: 12,
+    borderRadius: 8, 
+    alignItems: 'center',
+    marginTop: 16,
+    elevation: 3,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   errorText: {
     color: 'red',
     marginTop: 10,
     textAlign: 'center',
+    fontSize: 14,
   },
 });
+
 
 export default Login;

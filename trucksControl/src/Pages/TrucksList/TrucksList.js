@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore } from '../../../database/firebaseConfig';
+import CardTruck from '../../components/CardTruck/CardTruck';
 
 const TrucksList = () => {
   const [trucks, setTrucks] = useState([]);
@@ -25,46 +26,34 @@ const TrucksList = () => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {trucks.map((truck) => (
-        <View key={truck.plate} style={styles.card}>
-          <Image source={{ uri: truck.imageTruck }} style={styles.image} />
-          <Text style={styles.text}>Marca: {truck.brand}</Text>
-          <Text style={styles.text}>Modelo: {truck.model}</Text>
-          <Text style={styles.text}>Placa: {truck.plate}</Text>
-          <Text style={styles.text}>Ano: {truck.year}</Text>
-        </View>
-      ))}
-    </ScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Lista de Caminhões</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {trucks.map((truck) => (
+          <CardTruck key={truck.plate} truck={truck} />
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
-    marginTop: 24
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    flex: 1,
+    backgroundColor: '#f5f5f5',
     padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 2,
+    textAlign: 'center', 
+    marginTop: 20
   },
-  image: {
-    width: '100%',
-    height: 150,
-    borderRadius: 8,
-    marginBottom: 10,
-    resizeMode: 'contain'
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 8,
+  scrollContainer: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
   },
 });
 

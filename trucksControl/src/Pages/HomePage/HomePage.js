@@ -38,6 +38,7 @@ function HomePage({ navigation }) {
   const [truckPlate, setTruckPlate] = useState('');
 
   const [operatorName, setOperatorName] = useState('');
+  const [operatorEnterprise, setOperatorEnterprise] = useState('');
   const [operatorEmail, setOperatorEmail] = useState('');
   const [operatorPassword, setOperatorPassword] = useState('');
 
@@ -135,6 +136,7 @@ function HomePage({ navigation }) {
         name: operatorName,
         email: operatorEmail,
         isManager: false,
+        enterprise: operatorEnterprise,
       };
 
       const userRef = doc(firestore, 'users', uid);
@@ -191,7 +193,10 @@ function HomePage({ navigation }) {
             <Text style={styles.cardText}>Listar Caminhões</Text>
           </TouchableOpacity>
 
-          <View style={styles.cardContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('MechanicList')}
+            style={styles.cardContainer}
+          >
             <Image
               style={styles.cardImage}
               source={{
@@ -199,7 +204,7 @@ function HomePage({ navigation }) {
               }}
             />
             <Text style={styles.cardText}>Listar Operadores</Text>
-          </View>
+          </TouchableOpacity>
 
           <Modal
             isVisible={isTruckModalVisible}
@@ -263,6 +268,12 @@ function HomePage({ navigation }) {
                 value={operatorName}
                 onChangeText={setOperatorName}
               />
+              <Text>Empresa:</Text>
+              <TextInput
+                style={styles.input}
+                value={operatorEnterprise}
+                onChangeText={setOperatorEnterprise}
+              />
               <Text>Email:</Text>
               <TextInput
                 style={styles.input}
@@ -294,51 +305,11 @@ function HomePage({ navigation }) {
 
           <Text style={{ textAlign: 'center' }}>Bem vindo {user?.name}</Text>
           <TouchableOpacity
-            onPress={() => setIsRepairModalVisible(true)}
+            onPress={() => navigation.navigate('CreateRepair')}
             style={styles.repairButton}
           >
             <Text style={styles.repairButtonText}>Adicionar Reparo</Text>
           </TouchableOpacity>
-
-          <Modal
-            isVisible={isRepairModalVisible}
-            onBackdropPress={() => setIsRepairModalVisible(false)}
-          >
-            <View style={styles.modalContent}>
-              <Text>Placa:</Text>
-              <TextInput
-                style={styles.input}
-                value={operatorName}
-                onChangeText={setOperatorName}
-              />
-
-              <Text>Modelo:</Text>
-              <Picker
-                selectedValue={truckModel}
-                onValueChange={(itemValue) => setTruckModel(itemValue)}
-                style={{ backgroundColor: '#ccc' }}
-              >
-                <Picker.Item label="3/4" value="3/4" />
-                <Picker.Item label="Carreta" value="carreta" />
-                <Picker.Item label="Toco" value="toco" />
-                <Picker.Item label="Truck" value="truck" />
-              </Picker>
-
-              <Text>Email:</Text>
-              <TextInput
-                style={styles.input}
-                value={operatorEmail}
-                onChangeText={setOperatorEmail}
-                keyboardType="email-address"
-              />
-
-              <Button title="Salvar" onPress={handleSaveOperator} />
-              <Button
-                title="Cancelar"
-                onPress={() => setIsRepairModalVisible(false)}
-              />
-            </View>
-          </Modal>
         </>
       )}
     </View>
