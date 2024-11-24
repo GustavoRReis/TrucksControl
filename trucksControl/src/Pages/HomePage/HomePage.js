@@ -5,16 +5,16 @@ import {
   TouchableOpacity,
   View,
   TextInput,
-  Button,
   Image,
   ActivityIndicator,
+  Alert,
+  ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { auth, firestore } from '../../../database/firebaseConfig';
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
   query,
   setDoc,
@@ -23,9 +23,10 @@ import {
 import Modal from 'react-native-modal';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Asset } from 'expo-asset';
+
 
 function HomePage({ navigation }) {
   const [isTruckModalVisible, setTruckModalVisible] = useState(false);
@@ -47,6 +48,10 @@ function HomePage({ navigation }) {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState();
 
+  const handleLogout = async () => {
+      await signOut(auth); 
+      navigation.navigate('Login');
+  };
  
   useEffect(() => {
     const fetchUserByEmail = async () => {
@@ -82,6 +87,15 @@ function HomePage({ navigation }) {
   };
 
   const handleSaveTruck = async () => {
+
+     if (!truckModel || !truckBrand || !truckYear || !truckPlate) {
+       Alert.alert(
+          'Atenção',
+         'Não é possível cadastrar um caminhão sem informar todos os dados!'
+       );
+       return;
+     }
+
     try {
       const imageSource = imageMap[truckModel];
 
@@ -124,6 +138,19 @@ function HomePage({ navigation }) {
   };
 
   const handleSaveOperator = async () => {
+
+    if (
+      !operatorName ||
+      !operatorEmail ||
+      !operatorPassword ||
+      !operatorEnterprise
+    ) {
+       Alert.alert(
+         'Atenção',
+         'Não é possível cadastrar um operador sem informar todos os dados!'
+       );
+      return;
+    }
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -152,7 +179,7 @@ function HomePage({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {loading ? (
         <ActivityIndicator />
       ) : user?.isManager ? (
@@ -211,13 +238,13 @@ function HomePage({ navigation }) {
             onBackdropPress={() => setTruckModalVisible(false)}
           >
             <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Cadastrar Caminhão</Text>
               <Text>Placa:</Text>
               <TextInput
                 style={styles.input}
                 value={truckPlate}
                 onChangeText={setTruckPlate}
               />
-
               <Text>Modelo:</Text>
               <Picker
                 selectedValue={truckModel}
@@ -233,7 +260,7 @@ function HomePage({ navigation }) {
               <Picker
                 selectedValue={truckBrand}
                 onValueChange={(itemValue) => setTruckBrand(itemValue)}
-                style={{ backgroundColor: '#ccc' }}
+                style={styles.input}
               >
                 <Picker.Item label="Scania" value="Scania" />
                 <Picker.Item label="Iveco" value="Iveco" />
@@ -248,12 +275,18 @@ function HomePage({ navigation }) {
                 onChangeText={setTruckYear}
                 keyboardType="numeric"
               />
-
-              <Button title="Cadastrar" onPress={handleSaveTruck} />
-              <Button
-                title="Cancelar"
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleSaveTruck}
+              >
+                <Text style={styles.modalButtonText}>Cadastrar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
                 onPress={() => setTruckModalVisible(false)}
-              />
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
             </View>
           </Modal>
 
@@ -262,6 +295,7 @@ function HomePage({ navigation }) {
             onBackdropPress={() => setOperatorModalVisible(false)}
           >
             <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Cadastrar Operador</Text>
               <Text>Nome:</Text>
               <TextInput
                 style={styles.input}
@@ -288,11 +322,18 @@ function HomePage({ navigation }) {
                 onChangeText={setOperatorPassword}
                 secureTextEntry
               />
-              <Button title="Salvar" onPress={handleSaveOperator} />
-              <Button
-                title="Cancelar"
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleSaveOperator}
+              >
+                <Text style={styles.modalButtonText}>Salvar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
                 onPress={() => setOperatorModalVisible(false)}
-              />
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
             </View>
           </Modal>
         </>
@@ -312,7 +353,14 @@ function HomePage({ navigation }) {
           </TouchableOpacity>
         </>
       )}
-    </View>
+      <TouchableOpacity
+          onPress={handleLogout}
+          style={styles.button}
+        >
+          <MaterialCommunityIcons name="logout" size={28} color="white" />
+          <Text style={styles.buttonText}>Sair</Text>
+        </TouchableOpacity>
+    </ScrollView>
   );
 }
 
@@ -350,16 +398,56 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: '#f9f9f9',
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   input: {
-    height: 40,
-    borderColor: '#ccc',
+    height: 48,
     borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+    fontSize: 16,
+    backgroundColor: '#fff',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#344976',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#344976',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
     marginBottom: 10,
-    paddingHorizontal: 8,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: '#b8091e',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  cancelButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
   cardContainer: {
     backgroundColor: '#344976',
@@ -367,8 +455,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 3, 
-    shadowColor: '#000', 
+    elevation: 3,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,

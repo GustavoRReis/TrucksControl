@@ -1,11 +1,13 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore } from '../../../database/firebaseConfig';
 import CardTruck from '../../components/CardTruck/CardTruck';
+import { useNavigation } from '@react-navigation/native';
 
 const TrucksList = () => {
   const [trucks, setTrucks] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchTrucks = async () => {
@@ -27,6 +29,11 @@ const TrucksList = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Text style={{ marginTop: 6, paddingTop: 24, fontSize: 20 }}>
+          Voltar
+        </Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Lista de Caminhões</Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {trucks.map((truck) => (

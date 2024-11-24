@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { auth, firestore } from '../../../database/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -7,30 +16,23 @@ import { doc, getDoc } from 'firebase/firestore';
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // Estado para a mensagem de erro
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const authUser = auth;
-    console.log('AUTH', authUser);
+    if (auth.currentUser) {
+      navigation.replace('HomePage');
+    }
   }, []);
 
   const handleLogin = async () => {
-    console.log('Iniciando processo de login...');
     try {
-      // Limpar a mensagem de erro antes de tentar o login
       setErrorMessage('');
 
-      // Validação simples de email e senha
       if (!email || !password) {
         setErrorMessage('Por favor, preencha todos os campos.');
         return;
       }
 
-      console.log('auth', auth);
-      console.log('email', email)
-      console.log('senha', password)
-
-      // Autenticar usuário com email e senha
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -40,21 +42,17 @@ const Login = ({ navigation }) => {
       console.log('Usuário autenticado:', userCredential.user);
       const user = userCredential.user;
 
-      // Verificar se o usuário está no Firestore
       const userDocRef = doc(firestore, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
-        // Usuário autenticado e existe no Firestore
         console.log('Documento do usuário encontrado:', userDoc.data());
-        navigation.navigate('HomePage');
+        navigation.replace('HomePage');
       } else {
-        // Usuário autenticado, mas não encontrado no Firestore
         setErrorMessage('Usuário inválido ou não cadastrado.');
         console.log('Usuário não encontrado no Firestore.');
       }
     } catch (error) {
-      // Tratar erros de autenticação
       if (error.code === 'auth/user-not-found') {
         setErrorMessage('Usuário não encontrado.');
       } else if (error.code === 'auth/wrong-password') {
@@ -66,38 +64,45 @@ const Login = ({ navigation }) => {
     }
   };
 
-
   return (
-    <View style={styles.container}>
-      <View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={styles.logoContainer}>
         <Image
           style={styles.image}
           source={require('../../../assets/logo.png')}
         />
       </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-      <Button title="Entrar" onPress={handleLogin} />
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+          secureTextEntry
+          autoCapitalize="none"
+        />
 
-      {errorMessage ? (
-        <Text style={styles.errorText}>{errorMessage}</Text> // Renderizar a mensagem de erro
-      ) : null}
-    </View>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Entrar</Text>
+        </TouchableOpacity>
+
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -105,53 +110,53 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center', 
-    padding: 16,
     backgroundColor: '#f5f5f5',
+    padding: 16,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
   },
   image: {
     width: 250,
-    height: 400,
-    resizeMode: 'contain', 
+    height: 150,
+    resizeMode: 'contain',
+  },
+  formContainer: {
+    width: '100%',
+    maxWidth: 380,
+    paddingHorizontal: 16,
   },
   input: {
-    width: '100%',
-    maxWidth: 350, 
-    height: 45,
+    height: 50,
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 16,
     paddingHorizontal: 12,
     backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    fontSize: 16,
   },
   button: {
-    width: '100%',
-    maxWidth: 350,
-    backgroundColor: '#007BFF', 
-    padding: 12,
-    borderRadius: 8, 
+    height: 50,
+    backgroundColor: '#344976',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
+    borderRadius: 12,
+    marginTop: 20,
     elevation: 3,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   errorText: {
     color: 'red',
-    marginTop: 10,
+    marginTop: 15,
     textAlign: 'center',
     fontSize: 14,
   },
 });
-
 
 export default Login;

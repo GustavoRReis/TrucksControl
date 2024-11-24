@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 export default {
   expo: {
-    name: 'trucksControl',
+    name: 'Controle de Caminhões',
     slug: 'trucksControl',
     version: '1.0.0',
     orientation: 'portrait',
@@ -25,6 +25,7 @@ export default {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#FFFFFF',
       },
+      package: 'com.seunome.trucksControl', // Adicione o package aqui
     },
     web: {
       favicon: './assets/favicon.png',
@@ -37,6 +38,9 @@ export default {
         storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
         messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
         appId: process.env.FIREBASE_APP_ID,
+      },
+      eas: {
+        projectId: '74f77b2d-57c0-46f7-9c56-5a8be91ab03a',
       },
     },
   },

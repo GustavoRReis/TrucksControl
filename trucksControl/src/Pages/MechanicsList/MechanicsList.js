@@ -1,11 +1,19 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore } from '../../../database/firebaseConfig';
 import CardMechanics from '../../components/CardMechanics/CardMechanics';
+import { useNavigation } from '@react-navigation/native';
 
 const MechanicsList = () => {
   const [mechanics, setMechanics] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchMechanics = async () => {
@@ -30,6 +38,11 @@ const MechanicsList = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={{ marginTop: 6 ,paddingTop: 24, fontSize:20}}> Voltar</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Lista de Mecânicos</Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {mechanics.map((mechanic) => (
@@ -52,7 +65,7 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginBottom: 16,
-    marginTop: 22
+    marginTop: 22,
   },
   scrollContainer: {
     paddingVertical: 10,
