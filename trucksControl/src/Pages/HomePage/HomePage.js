@@ -488,12 +488,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     width: '100%',
     height: 100,
+    marginBottom: 12
   },
 
   repairButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+    marginBottom: 12
   },
 });
 

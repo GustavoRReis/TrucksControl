@@ -10,7 +10,13 @@ import {
   StyleSheet,
 } from 'react-native';
 import React, { useState } from 'react';
-import { doc, getDoc, collection, addDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  writeBatch,
+} from 'firebase/firestore';
 import { firestore } from '../../../database/firebaseConfig';
 import CardTruck from '../../components/CardTruck/CardTruck';
 import { Picker } from '@react-native-picker/picker';
@@ -31,7 +37,7 @@ const CreateRepair = () => {
     }
 
     try {
-      const truckDocRef = doc(firestore, 'trucks', plate.toUpperCase());
+      const truckDocRef = doc(firestore, 'trucks', plate);
       const truckDoc = await getDoc(truckDocRef);
 
       if (truckDoc.exists()) {
@@ -90,14 +96,6 @@ const CreateRepair = () => {
         (isRotation && !conditions.rotationTarget)
       );
     });
-
-    if (hasEmptyFields) {
-      Alert.alert(
-        'Erro',
-        'Por favor, preencha todos os campos de todos os pneus'
-      );
-      return;
-    }
 
     const tireData = tires.map((tire) => {
       const conditions = tireConditions[tire.id] || {};
